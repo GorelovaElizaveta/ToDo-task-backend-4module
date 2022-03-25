@@ -21,19 +21,34 @@ app.use(express.json());
 
 app.get("/allTasksSort", (req, res) => {
   const age = req.body.age;
-  Task.find()
-    .sort({ age: -1 })
-    .then((result) => {
-      res.send({ data: result });
-    });
+  const sortingDirection = req.query.sortingDirection;
+  if (sortingDirection) {
+    Task.find()
+      .sort({ age: sortingDirection })
+      .then((result) => {
+        res.send({ data: result });
+      });
+  } else {
+    Task.find()
+      .sort({ age: 1 })
+      .then((result) => {
+        res.send({ data: result });
+      });
+  }
 });
 
 app.get("/field", (req, res) => {
   const name = req.body.name;
   const age = req.body.age;
-  Task.find({ age: 13, name: "Petya" }).then((result) => {
-    res.send({ data: result });
-  });
+  const ageFiltr = req.query.ageFiltr;
+  const nameFiltr = req.query.nameFiltr;
+  if (ageFiltr && nameFiltr) {
+    Task.find({ age: ageFiltr, name: nameFiltr }).then((result) => {
+      res.send({ data: result });
+    });
+  } else {
+    res.send("All data must be entered. Not enough data");
+  }
 });
 
 app.get("/pagination", (req, res) => {
@@ -50,20 +65,27 @@ app.get("/pagination", (req, res) => {
 
 app.get("/sortPagination", (req, res) => {
   const age = req.body.age;
+  const ageSort = req.query.ageSort;
   const limit = req.query.limit;
   const page = req.query.page;
-  Task.find()
-    .sort({ age: 1 })
-    .skip((page - 1) * 10)
-    .limit(limit)
-    .then((result) => {
-      res.send({ data: result });
-    });
+  if (ageSort) {
+    Task.find()
+      .sort({ age: ageSort })
+      .skip((page - 1) * 10)
+      .limit(limit)
+      .then((result) => {
+        res.send({ data: result });
+      });
+  } else {
+    Task.find()
+      .sort({ age: 1 })
+      .skip((page - 1) * 10)
+      .limit(limit)
+      .then((result) => {
+        res.send({ data: result });
+      });
+  }
 });
-
-function getGoalsStat(players) {
-  return players.map(({ name, team, goals }) => ({ name, team, goals }));
-}
 
 app.get("/limitedfields", (req, res) => {
   const value = ["age", "name"];
