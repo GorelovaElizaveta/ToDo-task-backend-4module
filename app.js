@@ -1,4 +1,3 @@
-const { text } = require("body-parser");
 const express = require("express");
 const mongoose = require("mongoose");
 const app = express();
@@ -95,12 +94,19 @@ app.get("/limitedfields", (req, res) => {
 });
 
 app.post("/createTasks", (req, res) => {
-  const task = new Task(req.body);
-  task.save().then((result) => {
-    Task.find().then((result) => {
-      res.send({ data: result });
+  const {name, present, age, country} = req.body
+  let presentChek = req.body.hasOwnProperty("present")
+  if (name && presentChek && age && country) {
+    const task = new Task(req.body);
+
+    task.save().then(() => {
+      Task.find().then((result) => {
+        res.send({ data: result });
+      });
     });
-  });
+  } else {
+    res.send("task not found");
+  }
 });
 
 app.delete("/delete", (req, res) => {
@@ -110,6 +116,8 @@ app.delete("/delete", (req, res) => {
         res.send({ data: result });
       });
     });
+  } else {
+    res.send("task not found");
   }
 });
 
